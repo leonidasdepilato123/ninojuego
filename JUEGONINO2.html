@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivia Ciencia - Genially</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .pantalla {
+      display: none;
+    }
+    .pantalla.activa {
+      display: block;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Pantalla de inicio -->
+  <div class="pantalla activa" id="inicio">
+    <h1>Trivia Ciencia</h1>
+    <p>Selecciona una dificultad:</p>
+    <button onclick="empezarJuego('facil')">Fácil</button>
+    <button onclick="empezarJuego('medio')">Medio</button>
+    <button onclick="empezarJuego('dificil')">Difícil</button>
+  </div>
+
+  <!-- Contenedor de pantallas de preguntas -->
+  <div class="pantalla" id="pregunta"></div>
+
+  <!-- Pantalla de resultado -->
+  <div class="pantalla" id="resultado">
+    <h1 id="resultadoTexto"></h1>
+    <button onclick="location.reload()">Volver al inicio</button>
+  </div>
+
+  <script>
+    const preguntas = {
+      facil: [
+        { pregunta: "¿Cuál de estas opciones representa una característica de la ciencia?", opciones: ["Se basa en magia", "Se apoya en creencias", "Se construye con evidencia", "Cambia según la moda"], correcta: 2 },
+        { pregunta: "¿Qué actividad es más común entre científicos?", opciones: ["Aislarse del mundo", "Trabajar en colaboración", "Hacer trucos", "Recitar leyes"], correcta: 1 },
+        { pregunta: "¿Cuál de estos elementos NO es parte esencial del trabajo científico?", opciones: ["Observación", "Pruebas", "Opiniones personales", "Hipótesis"], correcta: 2 },
+        { pregunta: "¿Qué ocurre cuando se obtienen nuevos datos en ciencia?", opciones: ["Se ignoran", "Se adaptan teorías existentes", "Se desechan experimentos", "Se repite todo desde cero"], correcta: 1 },
+        { pregunta: "¿Cuál de estos personajes puede ser científico?", opciones: ["Solo personas con coeficiente alto", "Cualquier persona con curiosidad", "Solo profesores", "Solo quienes usan bata"], correcta: 1 },
+        { pregunta: "¿Qué se espera de una buena teoría científica?", opciones: ["Que nunca cambie", "Que se base en pruebas", "Que tenga palabras difíciles", "Que no se pueda cuestionar"], correcta: 1 },
+        { pregunta: "¿En qué se apoya la ciencia para avanzar?", opciones: ["Adivinanzas", "Opiniones", "Evidencias y revisiones", "Publicidad"], correcta: 2 },
+        { pregunta: "¿Qué relación hay entre ciencia y sociedad?", opciones: ["Son independientes", "La ciencia está aislada", "Están conectadas e influyen mutuamente", "La sociedad no entiende ciencia"], correcta: 2 },
+        { pregunta: "¿Por qué una teoría científica puede cambiar?", opciones: ["Porque se vuelve aburrida", "Porque se descubre nueva información", "Porque el científico lo decide", "Por moda"], correcta: 1 },
+        { pregunta: "¿Cuál es una idea equivocada sobre los científicos?", opciones: ["Que son personas normales", "Que trabajan en equipo", "Que son súper genios mágicos", "Que usan laboratorio"], correcta: 2 }
+      ],
+      medio: [
+        { pregunta: "¿Cuál de estas afirmaciones refleja una idea errónea sobre la ciencia?", opciones: ["Siempre se hace igual", "Evoluciona con nuevas ideas", "Tiene distintos métodos", "Puede cambiar con el tiempo"], correcta: 1 },
+        { pregunta: "¿Qué se espera de una hipótesis científica?", opciones: ["Que se acepte sin pruebas", "Que pueda ser probada", "Que sea siempre cierta", "Que no cambie nunca"], correcta: 1 },
+        { pregunta: "¿Qué afirmación es más acertada sobre el conocimiento científico?", opciones: ["Es absoluto", "Es temporal y revisable", "Es dogmático", "Es infalible"], correcta: 1 },
+        { pregunta: "¿Cuál de estos factores influye en la ciencia?", opciones: ["El azar únicamente", "La moda", "El contexto social", "El zodíaco"], correcta: 2 },
+        { pregunta: "¿Por qué el método científico no es una receta universal?", opciones: ["Porque varía según la disciplina", "Porque no sirve", "Porque es muy complicado", "Porque lo usan solo los expertos"], correcta: 0 },
+        { pregunta: "¿Cuál es una falsa creencia sobre la tecnología?", opciones: ["Que siempre surge de la ciencia", "Que impacta a la sociedad", "Que necesita conocimiento", "Que resuelve problemas"], correcta: 0 },
+        { pregunta: "¿Qué función cumplen los errores en ciencia?", opciones: ["Demuestran fracaso", "Ayudan a mejorar teorías", "Se deben ocultar", "No tienen valor"], correcta: 1 },
+        { pregunta: "¿Cuál es una señal de pensamiento científico?", opciones: ["Rechazar nuevas ideas", "Analizar con lógica y evidencia", "Confiar en intuiciones", "Seguir la tradición"], correcta: 1 },
+        { pregunta: "¿Por qué es importante enseñar la ciencia con contexto?", opciones: ["Para que se entienda su evolución", "Para que sea más difícil", "Para memorizar mejor", "Para que parezca seria"], correcta: 0 },
+        { pregunta: "¿Qué aspecto es esencial para hacer ciencia?", opciones: ["Curiosidad y método", "Solo tener laboratorio", "Inspiración divina", "Certezas absolutas"], correcta: 0 }
+      ],
+      dificil: [
+        { pregunta: "¿Qué problema epistemológico surge al presentar la ciencia como una actividad neutra?", opciones: ["Refuerza su carácter universal", "Ignora el contexto en que se produce", "Estimula el pensamiento abstracto", "Elimina el juicio crítico"], correcta: 1 },
+        { pregunta: "¿Por qué es un error enseñar el método científico como una receta única?", opciones: ["Porque no se ajusta a todas las disciplinas", "Porque es muy complejo", "Porque no sirve", "Porque lleva mucho tiempo"], correcta: 0 },
+        { pregunta: "¿Qué visión distorsionada aparece al pensar que los descubrimientos surgen de un instante de genialidad?", opciones: ["Que no requieren esfuerzo sostenido", "Que todo es posible", "Que la ciencia es mágica", "Que se necesita inspiración"], correcta: 0 },
+        { pregunta: "¿Qué se pasa por alto al afirmar que la ciencia es totalmente objetiva?", opciones: ["Su base matemática", "La influencia cultural", "Su poder predictivo", "Su lógica interna"], correcta: 1 },
+        { pregunta: "¿Por qué es un mito pensar que solo los genios hacen ciencia?", opciones: ["Porque niega la colaboración", "Porque es discriminatorio", "Porque no todos lo son", "Porque hay mujeres científicas"], correcta: 0 },
+        { pregunta: "¿Qué crítica recibe la enseñanza tradicional de ciencia en la escuela?", opciones: ["Es demasiado teórica", "No incluye el contexto social", "Es aburrida", "Solo usa fórmulas"], correcta: 1 },
+        { pregunta: "¿Qué pasa si se olvida el carácter histórico del conocimiento científico?", opciones: ["Se enseña más fácil", "Se pierde visión crítica", "Se vuelve más técnico", "No cambia mucho"], correcta: 1 },
+        { pregunta: "¿Qué limita la figura del ‘científico solitario’?", opciones: ["Oculta el trabajo en equipo", "Fomenta la individualidad", "Es una idea antigua", "Es poco motivadora"], correcta: 0 },
+        { pregunta: "¿Qué rol tienen los errores en ciencia?", opciones: ["Son necesarios para avanzar", "Son inevitables", "Se deben evitar", "Generan confusión"], correcta: 0 },
+        { pregunta: "¿Qué se omite al decir que la tecnología solo es ciencia aplicada?", opciones: ["Su impacto cultural", "Su autonomía", "Su origen", "Su utilidad"], correcta: 1 }
+      ]
+    };
+
+    let nivelActual = "";
+    let indicePregunta = 0;
+    let vidas = 1;
+
+    function empezarJuego(nivel) {
+      nivelActual = nivel;
+      indicePregunta = 0;
+      vidas = 1;
+      document.getElementById("inicio").classList.remove("activa");
+      document.getElementById("pregunta").classList.add("activa");
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      const contenedor = document.getElementById("pregunta");
+      const q = preguntas[nivelActual][indicePregunta];
+      let html = `<h2>${q.pregunta}</h2>`;
+      q.opciones.forEach((op, i) => {
+        html += `<button onclick="verificarRespuesta(${i})">${op}</button>`;
+      });
+      contenedor.innerHTML = html;
+    }
+
+    function verificarRespuesta(respuesta) {
+      const q = preguntas[nivelActual][indicePregunta];
+      if (respuesta === q.correcta) {
+        indicePregunta++;
+        if (indicePregunta >= preguntas[nivelActual].length) {
+          mostrarResultado(true);
+        } else {
+          mostrarPregunta();
+        }
+      } else {
+        vidas--;
+        if (vidas <= 0) {
+          mostrarResultado(false);
+        }
+      }
+    }
+
+    function mostrarResultado(gano) {
+      document.getElementById("pregunta").classList.remove("activa");
+      document.getElementById("resultado").classList.add("activa");
+      document.getElementById("resultadoTexto").textContent = gano ? "¡Ganaste! Respondiste todo correctamente." : "Perdiste. Volvé a intentarlo.";
+    }
+  </script>
+</body>
+</html>
